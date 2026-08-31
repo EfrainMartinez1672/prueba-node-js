@@ -19,12 +19,14 @@
  *
  * @property {string} efrain - Username.
  * @property {string} password - User password.
+ * @property {string} NIT - User NIT.
  * @property {string} email - User email.
  * @property {string} role - this indicates what permission the user has.
  *
  * @example
  * const dto: CreateUserDto = {
  *  name: "efrain",
+ *  NIT: "123456789",
  *  password: "dd123"
  *  email: "efrain@gmail.com"
  *  role: "admin"
@@ -35,6 +37,8 @@ export interface CreateUserDto {
     name: string;
 
     password: string;
+
+    NIT: string;
 
     email: string;
 
