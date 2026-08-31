@@ -22,7 +22,7 @@ export interface UserAttributes {
     email: string;
     password: string;
     name: string;
-    rol: string;
+    role: string;
 }
 
 /**
@@ -30,7 +30,7 @@ export interface UserAttributes {
  */
 export interface UserCreationAttributes extends Optional<
     UserAttributes,
-    "id" | "email" | "name" | "password" | "rol"
+    "id" | "email" | "name" | "password" | "role"
 > {}
 
 /**
@@ -50,7 +50,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     public name!: string;
 
     /** Rol del usuario. */
-    public rol!: string;
+    public role!: string;
 }
 
 /**
@@ -85,7 +85,7 @@ User.init(
             field: "first_name",
         },
 
-        rol: {
+        role: {
             type: DataTypes.STRING(30),
             allowNull: false,
             defaultValue: "user",

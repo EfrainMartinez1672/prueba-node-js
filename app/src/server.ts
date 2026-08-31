@@ -11,6 +11,11 @@ import path from "path"; //se importo path para poder usar el metodo join(sirve 
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./docs/swagger";
 import authRoutes from "./routes/auth.routes";
+import requestRoutes from "./routes/request.routes";
+import warehouseRoutes from "./routes/warehouse.routes";
+import medicineRoutes from "./routes/medicine.routes";
+import clinicRoutes from "./routes/clinic.routes";
+import seederRoutes from "./routes/seeder.routes";
 
 import userRoutes from "./routes/user.routes";
 
@@ -23,6 +28,13 @@ app.use(cookieParser());
 // Rutas
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/requests", requestRoutes);
+app.use("/api/warehouses", warehouseRoutes);
+app.use("/api/medicines", medicineRoutes);
+app.use("/api/clinics", clinicRoutes);
+app.use("/api/seeder", seederRoutes);
+
+// Swagger JSON
 
 app.get("/api/docs.json", (_req, res) => {
     res.status(200).json(swaggerSpec);

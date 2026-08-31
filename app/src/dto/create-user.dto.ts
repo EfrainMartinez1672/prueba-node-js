@@ -26,7 +26,6 @@
  * @example
  * const dto: CreateUserDto = {
  *  name: "efrain",
- *  NIT: "123456789",
  *  password: "dd123"
  *  email: "efrain@gmail.com"
  *  role: "admin"
@@ -36,9 +35,7 @@
 export interface CreateUserDto {
     name: string;
 
-    password: string;
-
-    NIT: string;
+    password: string;   
 
     email: string;
 

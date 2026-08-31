@@ -9,9 +9,9 @@ export const roleMiddleware = (allowedRoles: string[]) => {
     const userGoal = req.params?.email
     const userData = await userService.findOne(req.user.email)
 
-    const rol = allowedRoles.includes(userData.role)
+    const role = allowedRoles.includes(userData.role)
 
-    if (rol) {
+    if (role) {
         return next()
     } else if (userData.email === userGoal) {
         return next()
