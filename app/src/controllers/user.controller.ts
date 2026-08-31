@@ -6,30 +6,30 @@ import userService from "../services/user.service";
 
 /**
  * ============================================================================
- * Controlador de Usuarios
+ * User Controller
  * ============================================================================
  *
- * Este controlador gestiona las solicitudes HTTP relacionadas con la entidad `User`.
+ * This controller manages HTTP requests related to the `User` entity.
  *
- * Su única responsabilidad es actuar como intermediario entre el cliente
- * (HTTP) y la capa de servicios, delegando toda la lógica de negocio al `UserService`.
+ * Its sole responsibility is to act as an intermediary between the client
+ * (HTTP) and the service layer, delegating all business logic to `UserService`.
  *
- * Responsabilidades:
- *  - Recibir y procesar las solicitudes HTTP.
- *  - Obtener la información enviada por el cliente.
- *  - Invocar el servicio correspondiente.
- *  - Construir la respuesta HTTP.
- *  - Retornar los códigos de estado apropiados.
+ * Responsibilities:
+ *  - Receive and process HTTP requests.
+ *  - Retrieve information sent by the client.
+ *  - Invoke the corresponding service.
+ *  - Build the HTTP response.
+ *  - Return appropriate status codes.
  *
- * Este controlador NO debe:
- *  - Contener reglas de negocio.
- *  - Acceder directamente a la base de datos.
- *  - Ejecutar consultas mediante Sequelize.
- *  - Realizar validaciones complejas del dominio.
+ * This controller MUST NOT:
+ *  - Contain business rules.
+ *  - Access the database directly.
+ *  - Execute queries using Sequelize.
+ *  - Perform complex domain validations.
  *
- * Arquitectura:
+ * Architecture:
  *
- * Cliente HTTP
+ * HTTP Client
  *      │
  * UserController
  *      │
@@ -44,52 +44,52 @@ import userService from "../services/user.service";
  */
 
 /**
- * Crea un nuevo usuario.
+ * Creates a new user.
  *
- * Recibe la información enviada por el cliente, construye el DTO de creación
- * y delega la operación al servicio correspondiente.
+ * Receives the information sent by the client, constructs the creation DTO,
+ * and delegates the operation to the corresponding service.
  *
  * @async
  *
  * @param {Request} req
- * Objeto de la petición HTTP.
+ * HTTP request object.
  *
- * Espera recibir en el body:
+ * Expects to receive in the body:
  * @example
  *  {
- *  "name": pepe
- *  "password": pepe123
- *  "email": hlaluz59@gmail.com
- *  "role": admin
+ *  "name": "pepe",
+ *  "password": "pepe123",
+ *  "email": "hlaluz59@gmail.com",
+ *  "role": "admin"
  *  }
  *
  * @param {Response} res
- * Objeto utilizado para construir la respuesta HTTP.
+ * Object used to build the HTTP response.
  *
  * @returns {Promise<Response>}
- * Promesa que resuelve una respuesta HTTP.
+ * Promise resolving to an HTTP response.
  *
- * Posibles respuestas:
+ * Possible responses:
  *
  * - **201 Created**
- *   Usuario creado correctamente.
+ *   User created successfully.
  *
  * - **500 Internal Server Error**
- *   Error inesperado durante el procesamiento.
+ *   Unexpected error during processing.
  *
  * @throws {Error}
- * Cualquier excepción generada por la capa de servicios será capturada
- * y retornada como una respuesta HTTP con código 500.
+ * Any exception thrown by the service layer will be caught
+ * and returned as an HTTP response with status code 500.
  */
 export const createUser = async (req: Request, res: Response): Promise<Response> => {
     try {
-        // Construcción del DTO recibido desde el cliente.
+        // Construction of the DTO received from the client.
         const dto: CreateUserDto = req.body;
 
-        // Delega la lógica de negocio al servicio.
+        // Delegates business logic to the service.
         const user = await userService.create(dto);
 
-        // Retorna el recurso creado.
+        // Returns the created resource.
         return res.status(201).json(user);
     } catch (error: any) {
         return res.status(500).json({
@@ -99,50 +99,49 @@ export const createUser = async (req: Request, res: Response): Promise<Response>
 };
 
 /**
- * Obtiene el listado completo de usuarios.
+ * Retrieves the complete list of users.
  *
- * Delega la consulta a la capa de servicios, la cual será responsable de
- * aplicar cualquier regla de negocio antes de consultar el repositorio.
+ * Delegates the query to the service layer, which will be responsible for
+ * applying any business rules before querying the repository.
  *
  * @async
  *
  * @param {Request} _req
- * Objeto de la petición HTTP.
+ * HTTP request object.
  *
- * En este endpoint no se utiliza, por ello se antepone "_" al nombre de la
- * variable para indicar explícitamente que el parámetro es requerido por
- * Express pero no será utilizado.
+ * Not used in this endpoint, hence "_" is prefixed to the variable name
+ * to explicitly indicate that the parameter is required by Express but will not be used.
  *
  * @param {Response} res
- * Objeto utilizado para construir la respuesta HTTP.
+ * Object used to build the HTTP response.
  *
  * @returns {Promise<Response>}
- * Promesa que resuelve una respuesta HTTP.
+ * Promise resolving to an HTTP response.
  *
- * Posibles respuestas:
+ * Possible responses:
  *
  * - **200 OK**
- *   Lista de usuarios obtenida correctamente.
+ *   List of users retrieved successfully.
  *
  * - **500 Internal Server Error**
- *   Error inesperado durante la consulta.
+ *   Unexpected error during the query.
  *
  * @example
  * [
  *  {
- *  "name": pepe
- *  "password": pepe123
- *  "email": hlaluz59@gmail.com
- *  "role": admin
+ *  "name": "pepe",
+ *  "password": "pepe123",
+ *  "email": "hlaluz59@gmail.com",
+ *  "role": "admin"
  *  }
  * ]
  */
 export const getUsers = async (_req: Request, res: Response): Promise<Response> => {
     try {
-        // Solicita la información al servicio.
+        // Requests information from the service.
         const users = await userService.findAll();
 
-        // Retorna la colección de usuarios.
+        // Returns the collection of users.
         return res.status(200).json(users);
     } catch (error: any) {
         return res.status(500).json({
@@ -152,12 +151,21 @@ export const getUsers = async (_req: Request, res: Response): Promise<Response> 
 };  
 
 /**
+ * Updates an existing user by email.
+ *
+ * Extracts the email parameter from the request URL and partial user payload
+ * from the request body, delegating the update operation to the service.
+ *
+ * @async
  *
  * @param {Request} req
- * Obtiene la petición HTTP
+ * HTTP request object containing `email` in route params and DTO in body.
  *
  * @param {Response} res
- * @returns
+ * Object used to build the HTTP response.
+ *
+ * @returns {Promise<Response>}
+ * Promise resolving to an HTTP response.
  */
 export const updateUser = async (req: Request, res: Response): Promise<Response> => {
     try {
@@ -186,6 +194,20 @@ export const updateUser = async (req: Request, res: Response): Promise<Response>
     }
 };
 
+/**
+ * Deletes a user by email.
+ *
+ * @async
+ *
+ * @param {Request} req
+ * HTTP request object containing `email` in route params.
+ *
+ * @param {Response} res
+ * Object used to build the HTTP response.
+ *
+ * @returns {Promise<Response>}
+ * Promise resolving to an HTTP response.
+ */
 export const deleteUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { email } = req.params;
@@ -214,6 +236,20 @@ export const deleteUser = async (req: Request, res: Response): Promise<Response>
     }
 };
 
+/**
+ * Restores a previously soft-deleted user by email.
+ *
+ * @async
+ *
+ * @param {Request} req
+ * HTTP request object containing `email` in route params.
+ *
+ * @param {Response} res
+ * Object used to build the HTTP response.
+ *
+ * @returns {Promise<Response>}
+ * Promise resolving to an HTTP response.
+ */
 export const restoreUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { email } = req.params;

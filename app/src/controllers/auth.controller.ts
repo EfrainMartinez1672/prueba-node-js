@@ -5,25 +5,27 @@ import userService from "../services/user.service";
 import { generateToken } from "../utils/jwt";
 
 /**
- * Inicio de sesión el cual utiliza dos parametros como verificación, correo electrónico y contraseña
+ * User login handler verifying credentials via email address and password.
  *
  * @param {Request} req
- *  Objeto de la petición HTTP
+ *  HTTP request object containing `email` and `password` in the body.
  *
  * @param {Response} res
- *  Objeto utilizado para construir la respuesta HTTP.
+ *  HTTP response object.
  *
  * @returns {Promise<Response>}
- *  * Promesa que resuelve una respuesta HTTP.
+ *  Promise resolving to an HTTP response.
  *
- * Posibles respuestas:
+ * Possible responses:
  *
  * - **200 OK**
- *   Lista de usuarios obtenida correctamente.
+ *   User authenticated successfully and token issued.
  *
- * - **400**
+ * - **400 Bad Request**
+ *   Missing or invalid input parameters.
  *
- * - **401**
+ * - **401 Unauthorized**
+ *   Authentication failure or invalid credentials.
  */
 export const findUser = async (req: Request, res: Response): Promise<Response> => {
     try {

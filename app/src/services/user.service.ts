@@ -6,67 +6,66 @@ import repository from "../repositories/user.repository";
 import { IUserService } from "./interfaces/user.service.interface";
 
 /**
- * Servicio de Usuarios
- * --------------------
- * Contiene toda la lógica de negocio relacionada con la entidad User.
+ * User Service
+ * ------------
+ * Contains all business logic related to the User entity.
  *
- * Responsabilidades:
- *  - Validar reglas de negocio.
- *  - Coordinar operaciones entre uno o varios repositorios.
- *  - Orquestar procesos antes y después de persistir información.
- *  - Mantener al controlador libre de lógica de negocio.
+ * Responsibilities:
+ *  - Validate business rules.
+ *  - Coordinate operations between one or multiple repositories.
+ *  - Orchestrate processes before and after persisting information.
+ *  - Keep the controller free from business logic.
  *
- * Ejemplos de reglas de negocio:
+ * Examples of business rules:
  *
- *  Verificar que el correo electrónico no exista antes de crear el usuario.
- *  Validar que el dominio del correo pertenezca a la empresa.
- *  Encriptar la contraseña antes de almacenarla.
- *  Asignar un rol por defecto (Ej. "Gestor de solicitudes").
- *  Registrar un log de auditoría de la operación.
- *  Enviar un correo de bienvenida después del registro.
- *  Crear automáticamente un perfil asociado al usuario.
+ *  Verify that the email address does not exist before creating the user.
+ *  Validate that the email domain belongs to the company.
+ *  Hash the password before storing it.
+ *  Assign a default role (e.g., "Request Manager").
+ *  Log an audit entry for the operation.
+ *  Send a welcome email after registration.
+ *  Automatically create an associated profile for the user.
  *
- * El Service conoce las reglas del negocio.
- * El Repository únicamente conoce cómo guardar y consultar información.
+ * The Service knows the business rules.
+ * The Repository only knows how to store and retrieve data.
  */
 
 class UserService implements IUserService {
     async create(dto: CreateUserDto): Promise<User> {
         /**
-         * Ejemplo de regla de negocio:
+         * Business rule example:
          *
-         * Antes de crear un usuario podríamos validar que el correo
-         * electrónico no se encuentre registrado.
+         * Before creating a user, we could validate that the email
+         * address is not already registered.
          *
          * const existingUser = await repository.findByEmail(dto.email);
          *
          * if (existingUser) {
-         *     throw new Error("El correo electrónico ya se encuentra registrado.");
+         *     throw new Error("The email address is already registered.");
          * }
          *
-         * También podríamos:
-         *  - Encriptar la contraseña.
-         *  - Asignar un rol por defecto.
-         *  - Registrar la operación en una bitácora.
-         *  - Enviar un correo de bienvenida.
+         * We could also:
+         *  - Hash the password.
+         *  - Assign a default role.
+         *  - Log the operation in an audit log.
+         *  - Send a welcome email.
          */
 
         return await repository.create(dto as UserCreationAttributes);
     }
 
     /**
-     * Recupera todos los usuarios registrados en el sistema.
+     * Retrieves all registered users in the system.
      *
-     * Este método delega la consulta al repositorio de usuarios, el cual es el
-     * responsable de interactuar con la base de datos. En esta capa podrían
-     * incorporarse reglas de negocio adicionales, como filtros, paginación,
-     * ordenamiento o transformaciones de los datos antes de ser enviados al
-     * controlador.
+     * This method delegates the query to the user repository, which is
+     * responsible for interacting with the database. Additional business rules
+     * could be incorporated into this layer, such as filters, pagination,
+     * sorting, or data transformations before sending data to the controller.
      *
      * @async
-     * @returns {Promise<User[]>} Promesa que resuelve con un arreglo de objetos
-     *                            de tipo {@link User} que representan los usuarios
-     *                            encontrados en la base de datos.
+     * @returns {Promise<User[]>} Promise resolving to an array of objects
+     *                            of type {@link User} representing the users
+     *                            found in the database.
      *
      * @example
      * const users = await userService.findAll();
@@ -86,29 +85,51 @@ class UserService implements IUserService {
     }
 
     /**
-     * Este metodo esta encargado de delegar el inicio de sesión o log-in.
-     * Toma dos inputs el primero se usa para validar mediante el email si el usuario existe en la base de datos
+     * This method is responsible for delegating authentication or log-in lookup.
+     * Uses the email input to check if the user exists in the database.
      *
-     * @param {string} email -Correo electrónico de usuario
+     * @param {string} email - User email address
      *
-     * @returns {Promise<User>} -Retorna el usuario en forma de promesa luego de la verificación
+     * @returns {Promise<User>} - Returns the user wrapped in a promise after verification
      */
     async findOne(email: string): Promise<User> {
         const user = await repository.findOne(email);
         return user;
     }
 
+    /**
+     * Updates an existing user record identified by email.
+     *
+     * @async
+     * @param {string} email - Target user email address
+     * @param {Partial<CreateUserDto>} dto - Partial user attributes to update
+     * @returns {Promise<User | null>} The updated User object or null if not found
+     */
     async update(email: string, dto: Partial<CreateUserDto>): Promise<User | null> {
         const dataToUpdate: Partial<UserCreationAttributes> = { ...dto } as Partial<UserCreationAttributes>;
 
         return await repository.update(email, dataToUpdate);
     }
 
+    /**
+     * Deletes (or soft-deletes) a user record by email.
+     *
+     * @async
+     * @param {string} email - Target user email address
+     * @returns {Promise<Boolean>} True if deletion succeeded, false otherwise
+     */
     async delete(email: string): Promise<Boolean> {
         const userEmail = await repository.delete(email);
         return userEmail;
     }
 
+    /**
+     * Restores a soft-deleted user record by email.
+     *
+     * @async
+     * @param {string} email - Target user email address
+     * @returns {Promise<void>}
+     */
     async restore(email: string): Promise<void> {
         const userID = await repository.restore(email);
         return userID;

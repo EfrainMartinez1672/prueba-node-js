@@ -2,29 +2,36 @@ import User from "../models/user.model";
 import { compare_password, hash_password } from "../utils/auth";
 
 /**
- * Clase que contiene los metodos para hashing y comparación de contraseñas.
+ * Auth User Service
+ * -----------------
+ * Class containing utility methods for password hashing and credential verification.
  */
 class AuthUser {
     /**
+     * Hashes a plain-text password using the configured hashing algorithm.
      *
-     * @param {string} password
-     * @returns {Promise<String>}
+     * @async
+     * @param {string} password - Plain-text password to hash
+     * @returns {Promise<string>} Promise resolving to the hashed password string
      */
     async hashing(password: string): Promise<string> {
         return hash_password(password);
     }
 
     /**
+     * Authenticates a user by comparing a plain-text password against the stored password hash.
      *
-     * @param {User} user
-     * @param {String} passwordPlain
-     * @returns {User}
+     * @async
+     * @param {User} user - User model instance retrieved from the database
+     * @param {string} passwordPlain - Plain-text password provided during login
+     * @returns {Promise<User>} Promise resolving to the authenticated User instance
+     * @throws {Error} Throws an error if password verification fails
      */
     async login(user: User, passwordPlain: string): Promise<User> {
         const isMatch = await compare_password(passwordPlain, user.password);
 
         if (!isMatch) {
-            throw new Error("La contraseña es incorrecta.");
+            throw new Error("password incorrect.");
         }
 
         return user;
